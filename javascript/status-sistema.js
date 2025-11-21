@@ -32,7 +32,8 @@ class StatusSistema {
       const dados = await response.json();
 
       if (dados.success) {
-        this.processarStatus(dados.estatisticasUltimas24h);
+        // AGORA: Usamos as últimas medições para saber o estado ATUAL
+        this.processarStatus(dados.ultimasMedicoes || []);
       }
     } catch (error) {
       console.error("❌ Erro ao buscar status:", error);
@@ -41,22 +42,42 @@ class StatusSistema {
   }
 
   /**
-   * Processar e determinar o status geral
+   * Processar e determinar o status geral baseado no estado ATUAL dos sensores
    */
-  processarStatus(stats) {
-    const critico = stats.critico || 0;
-    const alto = stats.alto || 0;
-    const medio = stats.medio || 0;
-    const baixo = stats.baixo || 0;
-    const total = critico + alto + medio + baixo;
+  processarStatus(medicoes) {
+    // 1. Filtrar para pegar apenas a última medição de cada sensor único
+    const sensoresUnicos = {};
+    
+    medicoes.forEach(m => {
+      // Se ainda não tem esse sensor ou se essa medição é mais recente
+      if (!sensoresUnicos[m.sensor_id] || new Date(m.timestamp) > new Date(sensoresUnicos[m.sensor_id].timestamp)) {
+        sensoresUnicos[m.sensor_id] = m;
+      }
+    });
 
+    const estadosAtuais = Object.values(sensoresUnicos);
+    
+    // 2. Contar status atual
+    let critico = 0;
+    let alto = 0;
+    let medio = 0;
+    let baixo = 0;
+
+    estadosAtuais.forEach(m => {
+      const nivel = (m.nivel_risco || "BAIXO").toUpperCase();
+      if (nivel === "CRITICO") critico++;
+      else if (nivel === "ALTO") alto++;
+      else if (nivel === "MEDIO") medio++;
+      else baixo++;
+    });
+
+    const total = estadosAtuais.length;
+
+    // 3. Determinar status geral do sistema (Pior caso prevalece)
     let nivelStatus = "NORMAL";
     let iconStatus = "✅";
-    let percentualCritico = 0;
 
     if (total > 0) {
-      percentualCritico = (critico / total) * 100;
-
       if (critico > 0) {
         nivelStatus = "CRITICO";
         iconStatus = "🔴";
@@ -66,8 +87,8 @@ class StatusSistema {
       } else if (medio > 0) {
         nivelStatus = "MEDIO";
         iconStatus = "🟡";
-      } else if (baixo > 0) {
-        nivelStatus = "BAIXO";
+      } else {
+        nivelStatus = "BAIXO"; // Tudo normal
         iconStatus = "🟢";
       }
     }
@@ -85,7 +106,7 @@ class StatusSistema {
 
     // Log para debug
     console.log(
-      `📊 Status: ${nivelStatus} | Crítico: ${critico}, Alto: ${alto}, Médio: ${medio}, Baixo: ${baixo}`
+      `📊 Status Real-Time: ${nivelStatus} | Sensores: ${total} (🔴${critico} 🟠${alto} 🟡${medio} 🟢${baixo})`
     );
   }
 
@@ -105,15 +126,18 @@ class StatusSistema {
       <span class="status-texto">${nivel}</span>
     `;
 
-    // Atualizar tooltip
-    document.getElementById("tooltipCritico").textContent = critico;
-    document.getElementById("tooltipAlto").textContent = alto;
-    document.getElementById("tooltipMedio").textContent = medio;
-    document.getElementById("tooltipBaixo").textContent = baixo;
-    document.getElementById("tooltipTotal").textContent = total;
-    document.getElementById(
-      "tooltipUpdate"
-    ).textContent = `Atualizado ${this.formatarTempo(new Date())}`;
+    // Atualizar tooltip (Agora mostra contagem de SENSORES)
+    const setTooltip = (id, val) => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = val;
+    };
+
+    setTooltip("tooltipCritico", critico);
+    setTooltip("tooltipAlto", alto);
+    setTooltip("tooltipMedio", medio);
+    setTooltip("tooltipBaixo", baixo);
+    setTooltip("tooltipTotal", total);
+    setTooltip("tooltipUpdate", `Atualizado ${this.formatarTempo(new Date())}`);
 
     this.ultimaAtualizacao = new Date();
   }
@@ -139,7 +163,8 @@ class StatusSistema {
     if (diff < 60) return "agora";
     if (diff < 3600) return `há ${Math.floor(diff / 60)}m`;
     if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
-    return data.toLocaleString("pt-BR");
+    // FORÇAR FUSO HORÁRIO BRASIL
+    return data.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   }
 
   /**
@@ -159,4 +184,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Salvar referência global para parar se necessário
   window.statusSistema = statusSistema;
-});
+  });

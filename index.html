@@ -41,7 +41,7 @@
 
             <div class="status-tooltip">
               <div class="tooltip-header">
-                <strong>📊 Status do Sistema</strong>
+                <strong>Status do Sistema</strong>
               </div>
               <div class="tooltip-content">
                 <div class="tooltip-item">
@@ -166,7 +166,7 @@
                   class="section-icon"
                 />
                 <div class="text-top">
-                  <h2>Solo</h2>
+                  <h2>Solo <span class="badge-solo" id="tipo-solo-badge" style="font-size: 0.6em; background: #e9ecef; padding: 2px 8px; border-radius: 10px; color: #495057;">--</span></h2>
                   <p class="subtitle">Física e Geologia</p>
                 </div>
               </div>
@@ -193,6 +193,11 @@
                   -<small>°C</small>
                 </p>
               </div>
+              <!-- NOVO CARD: Qualidade da Leitura -->
+              <div class="stat-card">
+                <span class="stat-label">Qualidade Sinal</span>
+                <p class="stat-value" id="qualidade-leitura" style="font-size: 1.2rem;">-</p>
+              </div>
             </div>
 
             <div class="chart-box inclination-chart">
@@ -208,7 +213,7 @@
 
           <!-- Inserir o card do Índice de Risco onde desejar no layout -->
           <div class="card">
-            <h3>📊 Índice de Risco</h3>
+            <h3>Índice de Risco</h3>
             <div class="indice-container">
               <div class="indice-valor" id="indice-risco">0.0</div>
               <div class="indice-barra">
@@ -218,7 +223,7 @@
           </div>
 
           <div class="card">
-            <h3>💡 Recomendação</h3>
+            <h3>Recomendação</h3>
             <p id="recomendacao">Aguardando dados...</p>
           </div>
         </main>

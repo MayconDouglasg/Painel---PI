@@ -4,6 +4,7 @@
  */
 
 // URL do backend (trocar quando fizer deploy)
+// const API_URL = "https://bk-eroswatch.onrender.com/api";
 const API_URL = "https://bk-eroswatch.onrender.com/api";
 
 // ============================================
@@ -130,89 +131,72 @@ async function buscarPrevisaoClima(sensorId) {
 // ============================================
 
 /**
- * Atualiza cards de estatísticas
+ * Busca dados e inicia atualização da interface
  */
-async function atualizarDashboard() {
+async function iniciarAtualizacaoDashboard() {
   try {
     console.log("🔄 Atualizando dashboard...");
 
-    // ✅ BUSCAR DADOS PRIMEIRO
+    // 1. BUSCAR ESTATÍSTICAS GERAIS (Cards e Status)
     const stats = await buscarEstatisticas();
-    if (!stats) {
-      console.warn("⚠️ Nenhum dado retornado de estatísticas");
-      return;
+    
+    if (stats) {
+      const ultima = stats.ultimasMedicoes?.[0] || stats.data?.[0] || null;
+      
+      if (ultima) {
+        console.log("📊 Dados da última medição:", ultima);
+        
+        // Fallback para dados de clima se não vierem direto da medição
+        const tempAr = ultima.temperatura_ar || ultima.previsao?.temperatura || 0;
+        const umidAr = ultima.umidade_ar || ultima.previsao?.umidade || 0;
+
+        // Preparar dados para os cards
+        const dadosCards = {
+          nivel_risco: ultima.nivel_risco || ultima.risco || "DESCONHECIDO",
+          indice_risco: ultima.indice_risco ?? 0,
+          recomendacao: obterRecomendacao(ultima.nivel_risco || ultima.risco),
+          umidade_solo: ultima.umidade_solo ?? 0,
+          temperatura_solo: ultima.temperatura_solo ?? 0,
+          inclinacao: ultima.inclinacao_graus ?? 0,
+          temperatura_ar: tempAr,
+          umidade_ar: umidAr,
+          erosao: ultima.erosao?.taxa ?? 0,
+          // Novos campos
+          tipo_solo: ultima.sensores?.tipo_solo || "N/A",
+          qualidade_leitura: ultima.qualidade_leitura || "Normal"
+        };
+        
+        // Atualizar Cards e Status
+        renderizarDadosDashboard(dadosCards);
+        
+        // Atualizar Gráficos de Histórico (Umidade, Temp, Inclinação)
+        // Passamos as últimas medições para os gráficos
+        if (stats.ultimasMedicoes && window.atualizarGraficosHistorico) {
+           window.atualizarGraficosHistorico(stats.ultimasMedicoes);
+        }
+        
+        // 2. BUSCAR PREVISÃO DO CLIMA (Para o gráfico de chuva)
+        // Usamos o ID do sensor da última medição
+        if (ultima.sensor_id) {
+            const previsao = await buscarPrevisaoClima(ultima.sensor_id);
+            console.log("🌦️ Previsão do tempo recebida:", previsao);
+            
+            if (previsao) {
+                // Atualizar card de clima
+                atualizarCardClima(previsao);
+                
+                // Se tivermos a função de atualizar gráfico de chuva (futuro)
+                if (window.atualizarGraficoChuva) {
+                    window.atualizarGraficoChuva(previsao);
+                }
+            }
+        }
+      }
     }
 
-    // ✅ EXTRAIR ÚLTIMA MEDIÇÃO
-    const ultima = stats.ultimasMedicoes?.[0] || stats.data?.[0] || null;
-    if (!ultima) {
-      console.warn("⚠️ Nenhuma medição disponível");
-      return;
-    }
-
-    console.log("📊 Dados para dashboard:", ultima);
-
-    // ✅ PREPARAR OBJETO COM TODOS OS DADOS
-    const dados = {
-      nivel_risco: ultima.nivel_risco || ultima.risco || "DESCONHECIDO",
-      indice_risco: ultima.indice_risco ?? 0, // Usar ?? para null/undefined
-      recomendacao: obterRecomendacao(ultima.nivel_risco || ultima.risco),
-      umidade_solo: ultima.umidade_solo ?? 0,
-      temperatura_solo: ultima.temperatura_solo ?? 0,
-      inclinacao: ultima.inclinacao_graus ?? 0,
-      temperatura_ar: ultima.temperatura_ar ?? 0,
-      umidade_ar: ultima.umidade_ar ?? 0,
-      erosao: ultima.erosao?.taxa ?? 0,
-    };
-
-    console.log("✅ Objeto dados preparado:", dados);
-
-    // ✅ CHAMAR ATUALIZAÇÃO COM DADOS VÁLIDOS
-    atualizarDashboard(dados);
-
-    // ✅ ATUALIZAR CARDS DE SOLO
-    const elUmidadeSolo = document.getElementById("umidade-solo");
-    if (elUmidadeSolo) {
-      elUmidadeSolo.innerHTML = `${parseFloat(dados.umidade_solo || 0).toFixed(
-        1
-      )}<small>%</small>`;
-    }
-
-    const elInclinacao = document.getElementById("inclinacao");
-    if (elInclinacao) {
-      elInclinacao.innerHTML = `${parseFloat(dados.inclinacao || 0).toFixed(
-        1
-      )}<small>°</small>`;
-    }
-
-    const elTempSolo = document.getElementById("temperatura-solo");
-    if (elTempSolo) {
-      elTempSolo.innerHTML = `${parseFloat(dados.temperatura_solo || 0).toFixed(
-        1
-      )}<small>°C</small>`;
-    }
-
-    const elTaxa = document.getElementById("taxa-erosao");
-    if (elTaxa) {
-      elTaxa.innerHTML = `${parseFloat(dados.erosao || 0).toFixed(
-        2
-      )}<small>t/ha</small>`;
-    }
-
-    // ✅ ATUALIZAR CARDS DE CLIMA
-    const elUmidadeAr = document.getElementById("umidade-ar");
-    if (elUmidadeAr) {
-      elUmidadeAr.innerHTML = `${parseFloat(dados.umidade_ar || 0).toFixed(
-        0
-      )}<small>%</small>`;
-    }
-
-    const elTempAr = document.getElementById("temperatura-ar");
-    if (elTempAr) {
-      elTempAr.innerHTML = `${parseFloat(dados.temperatura_ar || 0).toFixed(
-        1
-      )}<small>°C</small>`;
-    }
+    // 3. BUSCAR ALERTAS DE RISCO (Para a lista de alertas)
+    const alertas = await buscarAlertasAtivos();
+    renderizarAlertas(alertas);
 
     console.log("✅ Dashboard atualizado com sucesso!");
   } catch (error) {
@@ -232,67 +216,182 @@ function obterRecomendacao(nivelRisco) {
   return recomendacoes[nivelRisco] || recomendacoes.DESCONHECIDO;
 }
 
-// ✅ ATUALIZAÇÃO DO DASHBOARD COM VERIFICAÇÃO DE SEGURANÇA
-function atualizarDashboard(dados) {
-  if (!dados) {
-    console.warn("⚠️ atualizarDashboard chamado com dados undefined");
-    return;
-  }
+// ✅ ATUALIZAÇÃO VISUAL DO DASHBOARD (CARDS)
+function renderizarDadosDashboard(dados) {
+  if (!dados) return;
 
-  console.log("🎨 Atualizando exibição visual com:", dados);
+  // 1. CARDS DE SOLO
+  atualizarElemento("umidade-solo", dados.umidade_solo, 1, "%");
+  atualizarElemento("inclinacao", dados.inclinacao, 1, "°");
+  atualizarElemento("temperatura-solo", dados.temperatura_solo, 1, "°C");
+  atualizarElemento("taxa-erosao", dados.erosao, 2, "t/ha");
+  
+  // Novos elementos
+  const elTipoSolo = document.getElementById("tipo-solo-badge");
+  if (elTipoSolo) elTipoSolo.textContent = dados.tipo_solo;
+  
+  const elQualidade = document.getElementById("qualidade-leitura");
+  if (elQualidade) elQualidade.textContent = dados.qualidade_leitura;
 
-  // Status geral
+  // 2. CARDS DE CLIMA (Dados atuais do sensor)
+  atualizarElemento("umidade-ar", dados.umidade_ar, 0, "%");
+  atualizarElemento("temperatura-ar", dados.temperatura_ar, 1, "°C");
+
+  // 3. STATUS GERAL E RISCO
   const statusEl = document.getElementById("status-geral");
   if (statusEl) {
     statusEl.textContent = dados.nivel_risco || "-";
     statusEl.className = (dados.nivel_risco || "").toLowerCase();
+    
+    // Piscar se CRÍTICO
+    if (dados.nivel_risco === "CRITICO") {
+        statusEl.classList.add("piscando");
+    } else {
+        statusEl.classList.remove("piscando");
+    }
   }
 
-  // Índice numérico
-  if (dados.indice_risco !== undefined && dados.indice_risco !== null) {
+  // Índice numérico e Barra
+  if (dados.indice_risco !== undefined) {
     const indiceEl = document.getElementById("indice-risco");
-    if (indiceEl) {
-      indiceEl.textContent = `${Number(dados.indice_risco).toFixed(1)}/100`;
-    }
+    if (indiceEl) indiceEl.textContent = `${Number(dados.indice_risco).toFixed(1)}/100`;
 
-    // Barra de progresso
     const barra = document.getElementById("barra-risco");
     if (barra) {
       const pct = Math.max(0, Math.min(100, Number(dados.indice_risco)));
       barra.style.width = `${pct}%`;
-
-      if (pct > 75) {
-        barra.style.backgroundColor = "#dc3545";
-      } else if (pct > 55) {
-        barra.style.backgroundColor = "#fd7e14";
-      } else if (pct > 30) {
-        barra.style.backgroundColor = "#ffc107";
-      } else {
-        barra.style.backgroundColor = "#28a745";
-      }
+      
+      // Cores da barra
+      if (pct > 75) barra.style.backgroundColor = "#dc3545";
+      else if (pct > 55) barra.style.backgroundColor = "#fd7e14";
+      else if (pct > 30) barra.style.backgroundColor = "#ffc107";
+      else barra.style.backgroundColor = "#28a745";
     }
   }
 
-  // Recomendação
-  if (dados.recomendacao) {
-    const rec = document.getElementById("recomendacao");
-    if (rec) rec.textContent = dados.recomendacao;
-  }
+  // 4. RECOMENDAÇÃO
+  const rec = document.getElementById("recomendacao");
+  if (rec) rec.textContent = dados.recomendacao || "Aguardando dados...";
+}
 
-  // Piscar se CRÍTICO
-  if (dados.nivel_risco === "CRITICO") {
-    statusEl?.classList.add("piscando");
-  } else {
-    statusEl?.classList.remove("piscando");
-  }
+// Helper para atualizar elementos HTML
+function atualizarElemento(id, valor, casasDecimais, unidade) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.innerHTML = `${parseFloat(valor || 0).toFixed(casasDecimais)}<small>${unidade}</small>`;
+    }
+}
+
+// ✅ ATUALIZAR CARD DE CLIMA (PREVISÃO)
+function atualizarCardClima(previsao) {
+    if (!previsao) return;
+    
+    // Chuva prevista 24h
+    const elChuva = document.querySelector("#climaCard .stat-value");
+    if (elChuva) {
+        elChuva.innerHTML = `${previsao.chuva_proximas_24h?.toFixed(1) || 0}<small>mm</small>`;
+    }
+    
+    const elRisco = document.getElementById("riscoClimaIndicator");
+    if (elRisco) {
+        if (previsao.risco_chuva_intensa) {
+            elRisco.textContent = "⚠️ Chuva Intensa Prevista";
+            elRisco.style.color = "#dc3545";
+        } else {
+            elRisco.textContent = "Sem risco imediato";
+            elRisco.style.color = "#28a745";
+        }
+    }
+    
+    // Chuva Agora (se disponível)
+    if (previsao.chuva_atual_3h !== undefined) {
+        atualizarElemento("chuva-agora", previsao.chuva_atual_3h, 1, "mm");
+    }
+}
+
+// ✅ RENDERIZAR LISTA DE ALERTAS (COM LIMITAÇÃO E BOTÃO VER MAIS)
+function renderizarAlertas(alertas) {
+    const container = document.querySelector(".risk-alerts");
+    // Manter o cabeçalho
+    const header = container.querySelector(".header-title-row");
+    
+    // Limpar conteúdo mantendo header
+    if (header) {
+        container.innerHTML = "";
+        container.appendChild(header);
+    } else {
+        const oldAlerts = container.querySelectorAll(".alert-card, .btn-ver-mais");
+        oldAlerts.forEach(el => el.remove());
+    }
+    
+    if (!alertas || alertas.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "alert-card empty";
+        empty.innerHTML = "<p>✅ Nenhum alerta de risco ativo no momento.</p>";
+        container.appendChild(empty);
+        return;
+    }
+    
+    // Limitar a 3 alertas inicialmente
+    const limiteInicial = 3;
+    const alertasVisiveis = alertas.slice(0, limiteInicial);
+    const alertasOcultos = alertas.slice(limiteInicial);
+    
+    // Função para criar card
+    const criarCard = (alerta) => {
+        const card = document.createElement("div");
+        card.className = `alert-card ${alerta.nivel_criticidade.toLowerCase()}`;
+        card.innerHTML = `
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <h4>${alerta.tipo_alerta.replace(/_/g, " ")}</h4>
+                <p>${alerta.mensagem || "Risco detectado pelo sistema."}</p>
+                <small>${new Date(alerta.timestamp).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+            </div>
+        `;
+        return card;
+    };
+    
+    // Renderizar os primeiros
+    alertasVisiveis.forEach(alerta => {
+        container.appendChild(criarCard(alerta));
+    });
+    
+    // Se houver mais, adicionar botão "Ver mais"
+    if (alertasOcultos.length > 0) {
+        const btnContainer = document.createElement("div");
+        btnContainer.style.textAlign = "center";
+        btnContainer.style.marginTop = "10px";
+        
+        const btnVerMais = document.createElement("button");
+        btnVerMais.className = "btn-ver-mais"; // Adicione estilo CSS se necessário
+        btnVerMais.textContent = `Ver mais (${alertasOcultos.length})`;
+        btnVerMais.style.padding = "8px 16px";
+        btnVerMais.style.cursor = "pointer";
+        btnVerMais.style.backgroundColor = "#e9ecef";
+        btnVerMais.style.border = "none";
+        btnVerMais.style.borderRadius = "4px";
+        btnVerMais.style.color = "#495057";
+        
+        btnVerMais.onclick = () => {
+            // Renderizar o restante
+            alertasOcultos.forEach(alerta => {
+                // Inserir antes do botão
+                container.insertBefore(criarCard(alerta), btnContainer);
+            });
+            // Remover botão após expandir
+            btnContainer.remove();
+        };
+        
+        btnContainer.appendChild(btnVerMais);
+        container.appendChild(btnContainer);
+    }
 }
 
 // ✅ EXECUTAR AO CARREGAR PÁGINA
 document.addEventListener("DOMContentLoaded", () => {
-  atualizarDashboard(); // Chama sem argumentos; a função busca os dados
-  setInterval(() => {
-    atualizarDashboard(); // Atualiza a cada 10 segundos
-  }, 10000);
+  iniciarAtualizacaoDashboard(); 
+  setInterval(iniciarAtualizacaoDashboard, 10000);
 });
 
 // Exportar funções para uso global
@@ -302,54 +401,6 @@ window.EroWatchAPI = {
   buscarAlertasAtivos,
   buscarSensores,
   buscarMedicoesPorPeriodo,
-  atualizarDashboard,
+  iniciarAtualizacaoDashboard,
   buscarPrevisaoClima,
 };
-
-// Atualizar exibição com índice de risco
-function atualizarDashboard(dados) {
-  // Status geral
-  const statusEl = document.getElementById("status-geral");
-  if (statusEl) {
-    statusEl.textContent = dados.nivel_risco || "-";
-    statusEl.className = (dados.nivel_risco || "").toLowerCase();
-  }
-
-  // NOVO: Índice numérico
-  if (dados.indice_risco !== undefined && dados.indice_risco !== null) {
-    const indiceEl = document.getElementById("indice-risco");
-    if (indiceEl)
-      indiceEl.textContent = `${Number(dados.indice_risco).toFixed(1)}/100`;
-
-    // Atualizar barra de progresso
-    const barra = document.getElementById("barra-risco");
-    if (barra) {
-      const pct = Math.max(0, Math.min(100, Number(dados.indice_risco)));
-      barra.style.width = `${pct}%`;
-
-      // Cor da barra baseada no risco
-      if (pct > 75) {
-        barra.style.backgroundColor = "#dc3545"; // Vermelho
-      } else if (pct > 55) {
-        barra.style.backgroundColor = "#fd7e14"; // Laranja
-      } else if (pct > 30) {
-        barra.style.backgroundColor = "#ffc107"; // Amarelo
-      } else {
-        barra.style.backgroundColor = "#28a745"; // Verde
-      }
-    }
-  }
-
-  // NOVO: Recomendação
-  if (dados.recomendacao !== undefined) {
-    const rec = document.getElementById("recomendacao");
-    if (rec) rec.textContent = dados.recomendacao || "Aguardando dados...";
-  }
-
-  // Piscar se CRÍTICO
-  if (dados.nivel_risco === "CRITICO") {
-    statusEl?.classList.add("piscando");
-  } else {
-    statusEl?.classList.remove("piscando");
-  }
-}

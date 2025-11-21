@@ -107,7 +107,7 @@ function renderizarTabela() {
       <td>${medicao.temperatura_ar?.toFixed(1) || '-'}°C</td>
       <td>${medicao.inclinacao_graus?.toFixed(1) || '-'}°</td>
       <td><span class="badge badge-${medicao.nivel_risco.toLowerCase()}">${medicao.nivel_risco}</span></td>
-      <td>${medicao.alerta_chuva ? '🌧️ Sim' : '☀️ Não'}</td>
+      <td>${medicao.alerta_chuva ? 'Sim' : 'Não'}</td>
     `;
     tbody.appendChild(tr);
   });
