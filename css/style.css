@@ -1,0 +1,645 @@
+:root {
+  --bg-body: #f3f6f9; /* Cinza muito suave para fundo */
+  --bg-sidebar: #002429;
+  --card-bg: #ffffff;
+
+  --primary-color: #2a9d8f; /* Verde/Ciano Principal */
+  --primary-dark: #21867a;
+  --secondary-color: #264653; /* Azul escuro para textos fortes */
+
+  --text-main: #2b2b2b;
+  --text-muted: #9a9b9c;
+
+  --risk-high: #e76f51;
+  --risk-medium: #f4a261;
+  --risk-low: #2a9d8f;
+
+  --border-radius: 16px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", sans-serif; /* Fonte moderna */
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden; /* Evita rolagem dupla com a sidebar */
+}
+
+/* --- LAYOUT PRINCIPAL (SIDEBAR + CONTEÚDO) --- */
+.dashboard-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+/* --- SIDEBAR (Antigo Header) --- */
+.main-header {
+  width: 260px;
+  background: var(--bg-sidebar);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  border-right: 1px solid #e1e1e1;
+  flex-shrink: 0; /* Não encolher */
+  z-index: 10;
+}
+
+.sidebar-top {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.logo img {
+  width: 80px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.lado h1 {
+  font-size: 1.4rem;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.lado p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Navegação Lateral */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.status-badge {
+  background: rgba(42, 157, 143, 0.1);
+  color: var(--primary-color);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-items a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.menu-items a:hover {
+  background-color: #f0f0f0;
+  color: var(--primary-color);
+}
+
+.menu-items a.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Esconde os pipes | antigos */
+.nav-links span[style*="#999"],
+.separator {
+  display: none;
+}
+
+/* Indicador de Tempo Real */
+.live-indicator {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 10px 15px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+  }
+  70% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 6px rgba(255, 0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* --- CONTEÚDO DA DIREITA (Content Wrapper) --- */
+.content-wrapper {
+  flex: 1;
+  overflow-y: auto; /* Rolagem apenas no conteúdo */
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* --- ALERTAS --- */
+.risk-alerts {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border-left: 5px solid var(--risk-high);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.header-title-row .icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.icons img {
+  width: 40px;
+}
+
+.risk-alerts h2 {
+  font-size: 1.2rem;
+  color: var(--text-main);
+}
+.risk-alerts .subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Barras de risco dentro dos alertas */
+.risk-bar {
+  background-color: #eee;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.risk-level {
+  height: 100%;
+  transition: width 1s ease;
+}
+.high-risk .risk-level {
+  background-color: var(--risk-high);
+}
+.medium-risk .risk-level {
+  background-color: var(--risk-medium);
+}
+.low-risk .risk-level {
+  background-color: var(--risk-low);
+}
+
+/* --- PAINEL DE DADOS (Grid Principal) --- */
+.data-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.climate-monitoring,
+.soil-metrics {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header .icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+.section-icon {
+  width: 45px;
+}
+.section-header h2 {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Cards de Estatísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid transparent;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  background: white;
+  border-color: #e1e1e1;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.highlight-card {
+  grid-column: span 2; /* Ocupa toda largura no card de destaque */
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+  border: 1px solid #b2ebf2;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-top: 5px;
+}
+.stat-value small {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.risk-metric {
+  color: var(--risk-high);
+}
+
+/* Gráficos */
+.chart-box {
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-top: auto; /* Empurra para baixo se sobrar espaço */
+}
+.chart-box h3 {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* ============================================
+   STATUS DO SISTEMA - NOVO COMPONENTE
+   ============================================ */
+
+.status-sistema-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  background-color: #17a2b8;
+  font-size: 0.95rem;
+  user-select: none;
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+  border: none;
+  text-align: center;
+}
+
+.status-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge:active {
+  transform: translateY(0);
+}
+
+.status-icon {
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  min-width: 24px;
+}
+
+.status-texto {
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+/* Estados do Badge */
+.status-badge.status-normal {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.status-badge.status-baixo {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.status-badge.status-medio {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: #333;
+  font-weight: 700;
+}
+
+.status-badge.status-alto {
+  background: linear-gradient(135deg, #fd7e14 0%, #fc6d1c 100%);
+  animation: pulse-alto 2s infinite;
+}
+
+.status-badge.status-critico {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  animation: pulse-critico 2s infinite;
+}
+
+/* Animações de Pulso */
+@keyframes pulse-critico {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 20px rgba(220, 53, 69, 0.6);
+  }
+}
+
+@keyframes pulse-alto {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(253, 126, 20, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 20px rgba(253, 126, 20, 0.6);
+  }
+}
+
+/* Tooltip - À LATERAL (DIREITA) */
+.status-tooltip {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  min-width: 320px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.status-sistema-container:hover .status-tooltip {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Seta do Tooltip (apontando para a esquerda) */
+.status-tooltip::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid white;
+  filter: drop-shadow(-2px 0 2px rgba(0, 0, 0, 0.1));
+}
+
+.tooltip-header {
+  background: linear-gradient(135deg, #2a9d8f 0%, #1e7a6d 100%);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px 12px 0 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.tooltip-content {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.tooltip-icon {
+  font-size: 16px;
+  min-width: 20px;
+}
+
+.tooltip-label {
+  font-weight: 600;
+  color: #555;
+  min-width: 65px;
+}
+
+.tooltip-value {
+  font-weight: 700;
+  color: #2a9d8f;
+  background: #f0f9f8;
+  padding: 3px 10px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 35px;
+  margin-left: auto;
+}
+
+.tooltip-footer {
+  background: #f8f9fa;
+  padding: 10px 16px;
+  border-top: 1px solid #e1e1e1;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.tooltip-footer strong {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+}
+
+.tooltip-footer small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* Responsividade - Tooltip volta para baixo em mobile */
+@media (max-width: 1024px) {
+  .status-tooltip {
+    left: auto;
+    top: auto;
+    bottom: 100%;
+    transform: none;
+    margin-left: 0;
+    margin-bottom: 12px;
+    min-width: 300px;
+  }
+
+  .status-tooltip::before {
+    display: none;
+  }
+
+  .status-tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+}
+
+@media (max-width: 768px) {
+  .status-badge {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    height: 52px;
+  }
+
+  .status-icon {
+    font-size: 18px;
+  }
+
+  .status-texto {
+    font-size: 0.9rem;
+  }
+
+  .status-tooltip {
+    position: fixed;
+    bottom: auto;
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    min-width: auto;
+  }
+
+  .status-tooltip::before,
+  .status-tooltip::after {
+    display: none;
+  }
+}
+
+/* Novos Estilos para o Índice */
+.indice-container {
+  text-align: center;
+  padding: 10px;
+}
+
+.indice-valor {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 5px 0;
+  color: #333;
+}
+
+.indice-barra {
+  width: 100%;
+  height: 20px;
+  background: #e9ecef;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.indice-progresso {
+  height: 100%;
+  transition: width 0.5s ease, background-color 0.5s ease;
+  border-radius: 15px;
+}
+
+.piscando {
+  animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.3;
+  }
+}
+
+#recomendacao {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  padding: 15px;
+  background: #f8f9fa;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  margin-top: 15px;
+}

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EroWatch - Monitoramento de Erosão</title>
+    <!-- Importando fonte moderna -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/png" href="/assets/logo.erowatch.png" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="javascript/status-sistema.js"></script>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- BARRA LATERAL (Antigo Header) -->
+      <header class="main-header">
+        <div class="sidebar-top">
+          <div class="logo">
+            <figure>
+              <img src="assets/logo.erowatch.png" alt="Logo do EroWatch" />
+            </figure>
+          </div>
+
+          <div class="lado">
+            <h1>EroWatch</h1>
+            <p>Monitoramento Inteligente</p>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- NOVO: Componente de Status do Sistema -->
+          <div class="status-sistema-container">
+            <div class="status-badge" id="statusBadge">
+              <span class="status-icon">⏳</span>
+              <span class="status-texto">Carregando...</span>
+            </div>
+
+            <div class="status-tooltip">
+              <div class="tooltip-header">
+                <strong>📊 Status do Sistema</strong>
+              </div>
+              <div class="tooltip-content">
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🔴</span>
+                  <span class="tooltip-label">Crítico:</span>
+                  <span class="tooltip-value" id="tooltipCritico">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟠</span>
+                  <span class="tooltip-label">Alto:</span>
+                  <span class="tooltip-value" id="tooltipAlto">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟡</span>
+                  <span class="tooltip-label">Médio:</span>
+                  <span class="tooltip-value" id="tooltipMedio">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟢</span>
+                  <span class="tooltip-label">Baixo:</span>
+                  <span class="tooltip-value" id="tooltipBaixo">0</span>
+                </div>
+              </div>
+              <div class="tooltip-footer">
+                <strong>Total: <span id="tooltipTotal">0</span></strong>
+                <small id="tooltipUpdate">Atualizado agora</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-links menu-items">
+            <a href="index.html" class="active">
+              <span class="icon"></span> Dashboard
+            </a>
+            <a href="historico.html"> <span class="icon"></span> Histórico </a>
+            <div class="live-indicator">
+              <span class="dot"></span> Tempo Real
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <!-- CONTEÚDO PRINCIPAL (Direita) -->
+      <div class="content-wrapper">
+        <section class="risk-alerts">
+          <div class="header-title-row">
+            <div class="icons">
+              <div class="top-img">
+                <img src="assets/alert.png" alt="Alertas" />
+              </div>
+              <div class="top-text">
+                <h2>Alertas de Risco</h2>
+                <p class="subtitle">
+                  Monitoramento em tempo real de áreas vulneráveis
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Alertas inseridos via JS -->
+        </section>
+
+        <main class="data-panel">
+          <section class="climate-monitoring">
+            <div class="section-header">
+              <div class="icons">
+                <img
+                  src="assets/icons8-tempestade-94.png"
+                  alt="Clima"
+                  class="section-icon"
+                />
+                <div class="text-top">
+                  <h2>Clima</h2>
+                  <p class="subtitle">Condições Meteorológicas</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card highlight-card" id="climaCard">
+              <span class="stat-label">Chuva Prevista (24h)</span>
+              <p class="stat-value">-<small>mm</small></p>
+              <span class="stat-indicator" id="riscoClimaIndicator"
+                >Aguardando dados...</span
+              >
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-label">Chuva Agora</span>
+                <p class="stat-value" id="chuva-agora">-<small>mm</small></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Umidade Ar</span>
+                <p class="stat-value" id="umidade-ar">-<small>%</small></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Vento</span>
+                <p class="stat-value" id="vento-ar">-<small>km/h</small></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Temp. Ar</span>
+                <p class="stat-value" id="temperatura-ar">-<small>°C</small></p>
+              </div>
+            </div>
+
+            <div class="chart-box precipitation-chart">
+              <h3>Precipitação (7 dias)</h3>
+              <canvas id="precipitationChart"></canvas>
+            </div>
+
+            <div class="chart-box temp-humidity-chart">
+              <h3>Temperatura & Umidade</h3>
+              <canvas id="tempHumidityChart"></canvas>
+            </div>
+          </section>
+
+          <section class="soil-metrics">
+            <div class="section-header">
+              <div class="icons">
+                <img
+                  src="assets/icons8-montanha-60.png"
+                  alt="Solo"
+                  class="section-icon"
+                />
+                <div class="text-top">
+                  <h2>Solo</h2>
+                  <p class="subtitle">Física e Geologia</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-label">Umidade Solo</span>
+                <p class="stat-value" id="umidade-solo">-<small>%</small></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Inclinação</span>
+                <p class="stat-value" id="inclinacao">-<small>°</small></p>
+              </div>
+              <div class="stat-card risk-card">
+                <span class="stat-label">Taxa de Erosão</span>
+                <p class="stat-value risk-metric" id="taxa-erosao">
+                  - <small>t/ha</small>
+                </p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Temp. Solo</span>
+                <p class="stat-value" id="temperatura-solo">
+                  -<small>°C</small>
+                </p>
+              </div>
+            </div>
+
+            <div class="chart-box inclination-chart">
+              <h3>Inclinação por Área</h3>
+              <canvas id="inclinationChart"></canvas>
+            </div>
+
+            <div class="chart-box humidity-evolution-chart">
+              <h3>Umidade (24h)</h3>
+              <canvas id="humidityEvolutionChart"></canvas>
+            </div>
+          </section>
+
+          <!-- Inserir o card do Índice de Risco onde desejar no layout -->
+          <div class="card">
+            <h3>📊 Índice de Risco</h3>
+            <div class="indice-container">
+              <div class="indice-valor" id="indice-risco">0.0</div>
+              <div class="indice-barra">
+                <div class="indice-progresso" id="barra-risco"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>💡 Recomendação</h3>
+            <p id="recomendacao">Aguardando dados...</p>
+          </div>
+        </main>
+      </div>
+      <!-- Fim do content-wrapper -->
+    </div>
+
+    <script src="javascript/script.js"></script>
+    <script src="javascript/api.js"></script>
+  </body>
+</html>

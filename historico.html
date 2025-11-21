@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Histórico de Medições - EroWatch</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/historico.css" />
+    <link rel="icon" type="image/png" href="/assets/logo.erowatch.png" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- BARRA LATERAL -->
+      <header class="main-header">
+        <div class="sidebar-top">
+          <div class="logo">
+            <figure>
+              <img src="assets/logo.erowatch.png" alt="Logo do EroWatch" />
+            </figure>
+          </div>
+
+          <div class="lado">
+            <h1>EroWatch</h1>
+            <p>Histórico de Dados</p>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="status-sistema-container">
+            <div class="status-badge" id="statusBadge">
+              <span class="status-icon">⏳</span>
+              <span class="status-texto">Carregando...</span>
+            </div>
+
+            <div class="status-tooltip">
+              <div class="tooltip-header">
+                <strong>📊 Status do Sistema</strong>
+              </div>
+              <div class="tooltip-content">
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🔴</span>
+                  <span class="tooltip-label">Crítico:</span>
+                  <span class="tooltip-value" id="tooltipCritico">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟠</span>
+                  <span class="tooltip-label">Alto:</span>
+                  <span class="tooltip-value" id="tooltipAlto">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟡</span>
+                  <span class="tooltip-label">Médio:</span>
+                  <span class="tooltip-value" id="tooltipMedio">0</span>
+                </div>
+                <div class="tooltip-item">
+                  <span class="tooltip-icon">🟢</span>
+                  <span class="tooltip-label">Baixo:</span>
+                  <span class="tooltip-value" id="tooltipBaixo">0</span>
+                </div>
+              </div>
+              <div class="tooltip-footer">
+                <strong>Total: <span id="tooltipTotal">0</span></strong>
+                <small id="tooltipUpdate">Atualizado agora</small>
+              </div>
+            </div>
+          </div>
+          <div class="nav-links menu-items">
+            <a href="index.html"> <span class="icon"></span> Dashboard </a>
+            <a href="historico.html" class="active">
+              <span class="icon"></span> Histórico
+            </a>
+          </div>
+        </nav>
+      </header>
+
+      <!-- CONTEÚDO PRINCIPAL -->
+      <div class="content-wrapper">
+        <main style="padding: 20px">
+          <div class="page-header-control">
+            <h2>Base de Conhecimento</h2>
+            <a href="index.html" class="nav-back"> ← Voltar ao Dashboard </a>
+          </div>
+
+          <!-- SEÇÃO DE FILTROS -->
+          <section class="filters-section">
+            <h3>🔍 Filtros de Busca</h3>
+
+            <div class="filters-grid">
+              <div class="filter-group">
+                <label for="filterSensor">Sensor</label>
+                <select id="filterSensor">
+                  <option value="">Todos os sensores</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="filterRisco">Nível de Risco</label>
+                <select id="filterRisco">
+                  <option value="">Todos os níveis</option>
+                  <option value="BAIXO">Baixo</option>
+                  <option value="MEDIO">Médio</option>
+                  <option value="ALTO">Alto</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="filterDataInicio">Data Início</label>
+                <input type="datetime-local" id="filterDataInicio" />
+              </div>
+
+              <div class="filter-group">
+                <label for="filterDataFim">Data Fim</label>
+                <input type="datetime-local" id="filterDataFim" />
+              </div>
+            </div>
+
+            <div class="filter-actions">
+              <button class="btn btn-secondary" onclick="limparFiltros()">
+                Limpar
+              </button>
+              <button class="btn btn-primary" onclick="aplicarFiltros()">
+                Buscar
+              </button>
+            </div>
+          </section>
+
+          <!-- TABELA DE MEDIÇÕES -->
+          <section class="measurements-table">
+            <div class="table-header">
+              <h2>📊 Medições Registradas</h2>
+              <button class="export-btn" onclick="exportarCSV()">
+                📥 Exportar CSV
+              </button>
+            </div>
+
+            <div id="loadingIndicator" class="loading">
+              🔄 Carregando dados...
+            </div>
+
+            <div id="tableContainer" style="display: none">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data/Hora</th>
+                    <th>Sensor</th>
+                    <th>Umidade Solo</th>
+                    <th>Temp. Solo</th>
+                    <th>Umidade Ar</th>
+                    <th>Temp. Ar</th>
+                    <th>Inclinação</th>
+                    <th>Nível de Risco</th>
+                    <th>Alerta Chuva</th>
+                  </tr>
+                </thead>
+                <tbody id="measurementsBody">
+                  <!-- Dados inseridos via JS -->
+                </tbody>
+              </table>
+
+              <div class="pagination">
+                <button id="prevPage" onclick="mudarPagina(-1)">
+                  ← Anterior
+                </button>
+                <span class="page-info" id="pageInfo">Página 1</span>
+                <button id="nextPage" onclick="mudarPagina(1)">
+                  Próxima →
+                </button>
+              </div>
+            </div>
+
+            <div id="noData" class="no-data" style="display: none">
+              📭 Nenhuma medição encontrada com os filtros selecionados.
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="javascript/api.js"></script>
+    <script src="javascript/historico.js"></script>
+    <script src="javascript/status-sistema.js"></script>
+  </body>
+</html>
