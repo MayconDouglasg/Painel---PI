@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Sensores - EroWatch Admin</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Auth Check -->
+    <script src="js/auth.js"></script>
+    <script>Auth.checkLogin();</script>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/logo.erowatch.png" alt="EroWatch" style="width: 40px; height: auto;">
+                <h2>EroWatch</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html">
+                    <span class="material-icons">dashboard</span> Visão Geral
+                </a>
+                <a href="sensores.html" class="active">
+                    <span class="material-icons">sensors</span> Sensores
+                </a>
+                <a href="alertas.html">
+                    <span class="material-icons">warning</span> Alertas
+                </a>
+                <a href="configuracoes.html">
+                    <span class="material-icons">settings</span> Configurações
+                </a>
+                <a href="#" onclick="Auth.logout()">
+                    <span class="material-icons">logout</span> Sair
+                </a>
+            </nav>
+            
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div class="details">
+                    <span id="userName">Admin</span>
+                    <small id="userRole">Administrador</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Gestão de Sensores</h1>
+                <button class="btn-primary" onclick="abrirModalSensor()">
+                    <span class="material-icons">add</span> Novo Sensor
+                </button>
+            </header>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <input type="text" id="buscaSensor" placeholder="Buscar por ID ou Região..." onkeyup="filtrarSensores()">
+                <select id="filtroStatus" onchange="filtrarSensores()">
+                    <option value="todos">Todos os Status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                    <option value="manutencao">Manutenção</option>
+                </select>
+            </div>
+
+            <!-- Sensors List -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Região</th>
+                                <th>Tipo</th>
+                                <th>Status</th>
+                                <th>Última Leitura</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaSensores">
+                            <!-- Preenchido via JS -->
+                            <tr>
+                                <td colspan="6" class="text-center">Carregando sensores...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Adicionar/Editar Sensor -->
+    <div id="modalSensor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Novo Sensor</h2>
+                <span class="material-icons close" onclick="fecharModalSensor()">close</span>
+            </div>
+            <form id="formSensor">
+                <input type="hidden" id="sensorId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Identificador *</label>
+                        <input type="text" id="identificador" required placeholder="Ex: SENSOR_05">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="tipo" required>
+                            <option value="hibrido">Híbrido (Solo + Ambiente)</option>
+                            <option value="solo">Solo</option>
+                            <option value="ambiente">Ambiente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Região *</label>
+                    <input type="text" id="regiao" required placeholder="Ex: Encosta Norte - Setor A">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="number" id="latitude" step="any" placeholder="-23.5505">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="number" id="longitude" step="any" placeholder="-46.6333">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <input type="text" id="responsavel" placeholder="Nome do técnico ou equipe">
+                </div>
+
+                <fieldset>
+                    <legend>Parâmetros Geológicos (Opcional)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Solo</label>
+                            <select id="tipo_solo">
+                                <option value="">Selecione...</option>
+                                <option value="ARENOSO">Arenoso</option>
+                                <option value="ARGILOSO">Argiloso</option>
+                                <option value="SILTOSO">Siltoso</option>
+                                <option value="ORGANICO">Orgânico</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Saturação Crítica (%)</label>
+                            <input type="number" id="saturacao_critica" step="0.1">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="fecharModalSensor()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Calibração -->
+    <div id="modalCalibracao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Calibrar Sensor</h2>
+                <span class="material-icons close" onclick="fecharModalCalibracao()">close</span>
+            </div>
+            <form id="formCalibracao">
+                <input type="hidden" id="calibSensorId">
+                
+                <div class="alert-info">
+                    Ajuste os parâmetros do solo para refinar o algoritmo de risco.
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Solo</label>
+                    <select id="calibTipoSolo" required onchange="atualizarDefaultsSolo()">
+                        <option value="ARENOSO">Arenoso</option>
+                        <option value="ARGILOSO">Argiloso</option>
+                        <option value="SILTOSO">Siltoso</option>
+                        <option value="ORGANICO">Orgânico</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Saturação Crítica (%) <span id="valSatCrit"></span></label>
+                    <input type="range" id="calibSatCrit" min="0" max="100" step="0.1" oninput="atualizarValoresCalib()">
+                </div>
+
+                <div class="form-group">
+                    <label>Saturação Total (%) <span id="valSatTotal"></span></label>
+                    <input type="range" id="calibSatTotal" min="0" max="100" step="0.1" oninput="atualizarValoresCalib()">
+                </div>
+
+                <div class="form-group">
+                    <label>Ângulo de Atrito (°) <span id="valAngulo"></span></label>
+                    <input type="range" id="calibAngulo" min="0" max="90" step="0.1" oninput="atualizarValoresCalib()">
+                </div>
+
+                <div class="form-group">
+                    <label>Coeficiente de Coesão <span id="valCoesao"></span></label>
+                    <input type="range" id="calibCoesao" min="0" max="1" step="0.01" oninput="atualizarValoresCalib()">
+                </div>
+
+                <div class="form-group">
+                    <label>Motivo da Calibração</label>
+                    <textarea id="calibMotivo" rows="2" placeholder="Ex: Ajuste após análise de solo em campo..." required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="fecharModalCalibracao()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Aplicar Calibração</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../javascript/api.js"></script>
+    <script src="js/sensores.js"></script>
+    <script>
+        // Preencher dados do usuário
+        const user = JSON.parse(localStorage.getItem('eroswatch_user') || '{}');
+        document.getElementById('userName').textContent = user.nome || 'Usuário';
+        document.getElementById('userRole').textContent = user.role || 'Visitante';
+    </script>
+</body>
+</html>

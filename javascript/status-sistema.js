@@ -75,21 +75,21 @@ class StatusSistema {
 
     // 3. Determinar status geral do sistema (Pior caso prevalece)
     let nivelStatus = "NORMAL";
-    let iconStatus = "✅";
+    let iconStatus = '<span class="material-icons">check_circle</span>';
 
     if (total > 0) {
       if (critico > 0) {
         nivelStatus = "CRITICO";
-        iconStatus = "🔴";
+        iconStatus = '<span class="material-icons">error</span>';
       } else if (alto > 0) {
         nivelStatus = "ALTO";
-        iconStatus = "🟠";
+        iconStatus = '<span class="material-icons">warning</span>';
       } else if (medio > 0) {
         nivelStatus = "MEDIO";
-        iconStatus = "🟡";
+        iconStatus = '<span class="material-icons">info</span>';
       } else {
         nivelStatus = "BAIXO"; // Tudo normal
-        iconStatus = "🟢";
+        iconStatus = '<span class="material-icons">check_circle</span>';
       }
     }
 
@@ -148,7 +148,7 @@ class StatusSistema {
   mostrarErro() {
     this.badge.className = "status-badge status-normal";
     this.badge.innerHTML = `
-      <span class="status-icon">⚠️</span>
+      <span class="status-icon"><span class="material-icons">signal_wifi_off</span></span>
       <span class="status-texto">Offline</span>
     `;
   }

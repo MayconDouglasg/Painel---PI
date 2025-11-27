@@ -8,6 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/historico.css" />
     <link rel="icon" type="image/png" href="/assets/logo.erowatch.png" />
@@ -32,7 +33,7 @@
         <nav class="sidebar-nav">
           <div class="status-sistema-container">
             <div class="status-badge" id="statusBadge">
-              <span class="status-icon">⏳</span>
+              <span class="material-icons status-icon">hourglass_empty</span>
               <span class="status-texto">Carregando...</span>
             </div>
 
@@ -42,22 +43,22 @@
               </div>
               <div class="tooltip-content">
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🔴</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-high)">error</span>
                   <span class="tooltip-label">Crítico:</span>
                   <span class="tooltip-value" id="tooltipCritico">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟠</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-medium)">warning</span>
                   <span class="tooltip-label">Alto:</span>
                   <span class="tooltip-value" id="tooltipAlto">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟡</span>
+                  <span class="material-icons tooltip-icon" style="color: #ffc107">info</span>
                   <span class="tooltip-label">Médio:</span>
                   <span class="tooltip-value" id="tooltipMedio">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟢</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-low)">check_circle</span>
                   <span class="tooltip-label">Baixo:</span>
                   <span class="tooltip-value" id="tooltipBaixo">0</span>
                 </div>
@@ -69,17 +70,20 @@
             </div>
           </div>
           <div class="nav-links menu-items">
-            <a href="index.html"> <span class="icon"></span> Dashboard </a>
+            <a href="index.html"> <span class="material-icons">dashboard</span> Dashboard </a>
             <a href="historico.html" class="active">
-              <span class="icon"></span> Histórico
+              <span class="material-icons">history</span> Histórico
             </a>
           </div>
 
           <!-- Botão de Tema -->
           <div class="theme-toggle-container">
             <button id="themeToggleBtn" class="theme-btn-sidebar">
-              <span class="icon">🌙</span> Modo Escuro
+              <span class="material-icons">dark_mode</span> Modo Escuro
             </button>
+            <a href="admin/login.html" class="theme-btn-sidebar" style="margin-top: 10px; text-decoration: none; justify-content: center;">
+                <span class="material-icons">login</span> Área Restrita
+            </a>
           </div>
         </nav>
       </header>

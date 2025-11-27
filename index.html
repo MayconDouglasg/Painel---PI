@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" type="image/png" href="/assets/logo.erowatch.png" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -35,7 +36,7 @@
           <!-- NOVO: Componente de Status do Sistema -->
           <div class="status-sistema-container">
             <div class="status-badge" id="statusBadge">
-              <span class="status-icon">⏳</span>
+              <span class="material-icons status-icon">hourglass_empty</span>
               <span class="status-texto">Carregando...</span>
             </div>
 
@@ -45,22 +46,22 @@
               </div>
               <div class="tooltip-content">
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🔴</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-high)">error</span>
                   <span class="tooltip-label">Crítico:</span>
                   <span class="tooltip-value" id="tooltipCritico">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟠</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-medium)">warning</span>
                   <span class="tooltip-label">Alto:</span>
                   <span class="tooltip-value" id="tooltipAlto">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟡</span>
+                  <span class="material-icons tooltip-icon" style="color: #ffc107">info</span>
                   <span class="tooltip-label">Médio:</span>
                   <span class="tooltip-value" id="tooltipMedio">0</span>
                 </div>
                 <div class="tooltip-item">
-                  <span class="tooltip-icon">🟢</span>
+                  <span class="material-icons tooltip-icon" style="color: var(--risk-low)">check_circle</span>
                   <span class="tooltip-label">Baixo:</span>
                   <span class="tooltip-value" id="tooltipBaixo">0</span>
                 </div>
@@ -72,11 +73,21 @@
             </div>
           </div>
 
+          <!-- SELETOR DE SENSOR (NOVO) -->
+          <div class="sensor-selector-container" style="padding: 0 15px 15px 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+            <label for="dashboardSensorSelect" style="display: block; margin-bottom: 8px; font-size: 0.85em; color: var(--text-secondary); font-weight: 600;">
+                <span class="material-icons" style="font-size: 14px; vertical-align: middle;">place</span> LOCALIZAÇÃO
+            </label>
+            <select id="dashboardSensorSelect" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-family: 'Inter', sans-serif;">
+                <option value="">🌎 Visão Geral</option>
+            </select>
+          </div>
+
           <div class="nav-links menu-items">
             <a href="index.html" class="active">
-              <span class="icon"></span> Dashboard
+              <span class="material-icons">dashboard</span> Dashboard
             </a>
-            <a href="historico.html"> <span class="icon"></span> Histórico </a>
+            <a href="historico.html"> <span class="material-icons">history</span> Histórico </a>
             <div class="live-indicator">
               <span class="dot"></span> Tempo Real
             </div>
@@ -85,8 +96,11 @@
           <!-- Botão de Tema -->
           <div class="theme-toggle-container">
             <button id="themeToggleBtn" class="theme-btn-sidebar">
-              <span class="icon">🌙</span> Modo Escuro
+              <span class="material-icons">dark_mode</span> Modo Escuro
             </button>
+            <a href="admin/login.html" class="theme-btn-sidebar" style="margin-top: 10px; text-decoration: none; justify-content: center;">
+                <span class="material-icons">login</span> Área Restrita
+            </a>
           </div>
         </nav>
       </header>
@@ -97,7 +111,7 @@
           <div class="header-title-row">
             <div class="icons">
               <div class="top-img">
-                <img src="assets/alert.png" alt="Alertas" />
+                <span class="material-icons" style="font-size: 40px; color: var(--risk-high);">notifications_active</span>
               </div>
               <div class="top-text">
                 <h2>Alertas de Risco</h2>
@@ -114,11 +128,7 @@
           <section class="climate-monitoring">
             <div class="section-header">
               <div class="icons">
-                <img
-                  src="assets/icons8-tempestade-94.png"
-                  alt="Clima"
-                  class="section-icon"
-                />
+                <span class="material-icons section-icon" style="font-size: 45px; color: var(--primary-color);">thunderstorm</span>
                 <div class="text-top">
                   <h2>Clima</h2>
                   <p class="subtitle">Condições Meteorológicas</p>
@@ -167,11 +177,7 @@
           <section class="soil-metrics">
             <div class="section-header">
               <div class="icons">
-                <img
-                  src="assets/icons8-montanha-60.png"
-                  alt="Solo"
-                  class="section-icon"
-                />
+                <span class="material-icons section-icon" style="font-size: 45px; color: var(--secondary-color);">landscape</span>
                 <div class="text-top">
                   <h2>Solo <span class="badge-solo" id="tipo-solo-badge" style="font-size: 0.6em; background: #e9ecef; padding: 2px 8px; border-radius: 10px; color: #495057;">--</span></h2>
                   <p class="subtitle">Física e Geologia</p>

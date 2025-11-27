@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - EroWatch</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Auth Check -->
+    <script src="js/auth.js"></script>
+    <script>Auth.checkLogin();</script>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/logo.erowatch.png" alt="EroWatch" style="width: 40px; height: auto;">
+                <h2>EroWatch</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="active">
+                    <span class="material-icons">dashboard</span> Visão Geral
+                </a>
+                <a href="sensores.html">
+                    <span class="material-icons">sensors</span> Sensores
+                </a>
+                <a href="alertas.html">
+                    <span class="material-icons">warning</span> Alertas
+                </a>
+                <a href="configuracoes.html">
+                    <span class="material-icons">settings</span> Configurações
+                </a>
+                <a href="#" onclick="Auth.logout()">
+                    <span class="material-icons">logout</span> Sair
+                </a>
+            </nav>
+            
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div class="details">
+                    <span id="userName">Admin</span>
+                    <small id="userRole">Administrador</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Visão Geral do Sistema</h1>
+                <div class="date-display" id="currentDate">--/--/----</div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon-bg blue">
+                        <span class="material-icons">sensors</span>
+                    </div>
+                    <div class="info">
+                        <h3>Sensores Ativos</h3>
+                        <p class="value">--</p>
+                        <small class="trend">-- total</small>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="icon-bg red">
+                        <span class="material-icons">warning</span>
+                    </div>
+                    <div class="info">
+                        <h3>Alertas Críticos</h3>
+                        <p class="value">--</p>
+                        <small class="trend">Ação necessária</small>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="icon-bg green">
+                        <span class="material-icons">check_circle</span>
+                    </div>
+                    <div class="info">
+                        <h3>Sistema Online</h3>
+                        <p class="value">--</p>
+                        <small class="trend">Status Operacional</small>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="icon-bg orange">
+                        <span class="material-icons">bolt</span>
+                    </div>
+                    <div class="info">
+                        <h3>Uptime</h3>
+                        <p class="value">99.9%</p>
+                        <small class="trend">Estável</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Row -->
+            <div class="content-row">
+                <!-- Critical Alerts List -->
+                <div class="card large">
+                    <div class="card-header">
+                        <h2><span class="material-icons" style="color: var(--danger)">notifications_active</span> Alertas Pendentes</h2>
+                        <a href="alertas.html" class="btn-link">Ver todos</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert-list-admin">
+                            <p class="placeholder-text">Carregando alertas...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card small">
+                    <div class="card-header">
+                        <h2><span class="material-icons" style="color: var(--primary)">flash_on</span> Ações Rápidas</h2>
+                    </div>
+                    <div class="card-body actions-grid">
+                        <button class="action-btn" onclick="location.href='sensores.html'">
+                            <span class="material-icons">add_circle</span> Novo Sensor
+                        </button>
+                        <button class="action-btn" onclick="location.href='configuracoes.html'">
+                            <span class="material-icons">tune</span> Ajustar Risco
+                        </button>
+                        <button class="action-btn" style="display: none;">
+                            <span class="material-icons">description</span> Ver Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- API & Dashboard Logic -->
+    <script src="../javascript/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Preencher dados do usuário
+        const user = JSON.parse(localStorage.getItem('eroswatch_user') || '{}');
+        document.getElementById('userName').textContent = user.nome || 'Usuário';
+        document.getElementById('userRole').textContent = user.role || 'Visitante';
+        
+        // Data atual
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR');
+    </script>
+</body>
+</html>

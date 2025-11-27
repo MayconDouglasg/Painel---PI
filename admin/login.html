@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrativo - EroWatch</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="login-page">
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <img src="../assets/logo.erowatch.png" alt="EroWatch Logo" style="width: 60px; height: auto;">
+            </div>
+            <h1>EroWatch <span class="badge">Admin</span></h1>
+            <p>Acesso restrito ao sistema de gestão</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="admin@eroswatch.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="••••••••" required>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <button type="submit" class="btn-login">
+                <span class="btn-text">Entrar no Sistema</span>
+                <span class="loader" style="display: none;"></span>
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <a href="../index.html">← Voltar para o site público</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+</body>
+</html>

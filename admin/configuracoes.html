@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - EroWatch Admin</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Auth Check -->
+    <script src="js/auth.js"></script>
+    <script>Auth.checkLogin();</script>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/logo.erowatch.png" alt="EroWatch" style="width: 40px; height: auto;">
+                <h2>EroWatch</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html">
+                    <span class="material-icons">dashboard</span> Visão Geral
+                </a>
+                <a href="sensores.html">
+                    <span class="material-icons">sensors</span> Sensores
+                </a>
+                <a href="alertas.html">
+                    <span class="material-icons">warning</span> Alertas
+                </a>
+                <a href="configuracoes.html" class="active">
+                    <span class="material-icons">settings</span> Configurações
+                </a>
+                <a href="#" onclick="Auth.logout()">
+                    <span class="material-icons">logout</span> Sair
+                </a>
+            </nav>
+            
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div class="details">
+                    <span id="userName">Admin</span>
+                    <small id="userRole">Administrador</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Configurações do Sistema</h1>
+            </header>
+
+            <!-- Tipos de Solo -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Tipos de Solo e Parâmetros Geotécnicos</h2>
+                    <button class="btn-primary" onclick="abrirModalSolo()">
+                        <span class="material-icons">add</span> Novo Tipo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Sat. Crítica (%)</th>
+                                    <th>Sat. Total (%)</th>
+                                    <th>Ângulo Atrito (°)</th>
+                                    <th>Coesão</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaSolos">
+                                <tr><td colspan="6" class="text-center">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Tipo de Solo -->
+    <div id="modalSolo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalSoloTitle">Novo Tipo de Solo</h2>
+                <span class="material-icons close" onclick="fecharModalSolo()">close</span>
+            </div>
+            <form id="formSolo">
+                <input type="hidden" id="soloId">
+                
+                <div class="form-group">
+                    <label>Nome do Solo *</label>
+                    <input type="text" id="soloNome" required placeholder="Ex: GRANÍTICO">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Saturação Crítica (%) *</label>
+                        <input type="number" id="soloSaturacaoCritica" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Saturação Total (%) *</label>
+                        <input type="number" id="soloSaturacaoTotal" step="0.1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ângulo de Atrito (°) *</label>
+                        <input type="number" id="soloAngulo" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Coeficiente de Coesão (0-1) *</label>
+                        <input type="number" id="soloCoesao" step="0.01" min="0" max="1" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="fecharModalSolo()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../javascript/api.js"></script>
+    <script src="js/config.js"></script>
+    <script>
+        // Preencher dados do usuário
+        const user = JSON.parse(localStorage.getItem('eroswatch_user') || '{}');
+        document.getElementById('userName').textContent = user.nome || 'Usuário';
+        document.getElementById('userRole').textContent = user.role || 'Visitante';
+    </script>
+</body>
+</html>

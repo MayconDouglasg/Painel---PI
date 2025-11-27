@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Alertas - EroWatch Admin</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Auth Check -->
+    <script src="js/auth.js"></script>
+    <script>Auth.checkLogin();</script>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/logo.erowatch.png" alt="EroWatch" style="width: 40px; height: auto;">
+                <h2>EroWatch</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html">
+                    <span class="material-icons">dashboard</span> Visão Geral
+                </a>
+                <a href="sensores.html">
+                    <span class="material-icons">sensors</span> Sensores
+                </a>
+                <a href="alertas.html" class="active">
+                    <span class="material-icons">warning</span> Alertas
+                </a>
+                <a href="configuracoes.html">
+                    <span class="material-icons">settings</span> Configurações
+                </a>
+                <a href="#" onclick="Auth.logout()">
+                    <span class="material-icons">logout</span> Sair
+                </a>
+            </nav>
+            
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div class="details">
+                    <span id="userName">Admin</span>
+                    <small id="userRole">Administrador</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Gestão de Alertas</h1>
+                <div class="stats-mini">
+                    <div class="stat-item danger">
+                        <span class="label">Críticos</span>
+                        <span class="value" id="statCriticos">0</span>
+                    </div>
+                    <div class="stat-item warning">
+                        <span class="label">Altos</span>
+                        <span class="value" id="statAltos">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <select id="filtroStatus" onchange="carregarAlertas()">
+                    <option value="ativo">Ativos</option>
+                    <option value="resolvido">Resolvidos</option>
+                    <option value="ignorado">Ignorados</option>
+                </select>
+                <select id="filtroCriticidade" onchange="carregarAlertas()">
+                    <option value="">Todas as Criticidades</option>
+                    <option value="CRITICO">Crítico</option>
+                    <option value="ALTO">Alto</option>
+                    <option value="MEDIO">Médio</option>
+                </select>
+                <button class="btn-secondary" onclick="carregarAlertas()">
+                    <span class="material-icons">refresh</span> Atualizar
+                </button>
+            </div>
+
+            <!-- Alerts List -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Sensor</th>
+                                <th>Tipo</th>
+                                <th>Criticidade</th>
+                                <th>Mensagem</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaAlertas">
+                            <tr><td colspan="6" class="text-center">Carregando alertas...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Resolver Alerta -->
+    <div id="modalResolver" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Resolver Alerta</h2>
+                <span class="material-icons close" onclick="fecharModalResolver()">close</span>
+            </div>
+            <form id="formResolver">
+                <input type="hidden" id="resolverId">
+                <input type="hidden" id="acaoTipo"> <!-- 'resolver' ou 'ignorar' -->
+                
+                <div class="alert-info" id="alertaInfo"></div>
+
+                <div class="form-group">
+                    <label>Observações / Ações Tomadas</label>
+                    <textarea id="resolverObs" rows="3" required placeholder="Descreva o que foi feito..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="fecharModalResolver()">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btnConfirmarAcao">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../javascript/api.js"></script>
+    <script src="js/alertas.js"></script>
+    <script>
+        // Preencher dados do usuário
+        const user = JSON.parse(localStorage.getItem('eroswatch_user') || '{}');
+        document.getElementById('userName').textContent = user.nome || 'Usuário';
+        document.getElementById('userRole').textContent = user.role || 'Visitante';
+    </script>
+</body>
+</html>

@@ -49,8 +49,8 @@ const ThemeManager = {
     
     // Atualiza o conteúdo do botão na sidebar
     btn.innerHTML = isDark 
-      ? '<span class="icon">☀️</span> Modo Claro' 
-      : '<span class="icon">🌙</span> Modo Escuro';
+      ? '<span class="material-icons">light_mode</span> Modo Claro' 
+      : '<span class="material-icons">dark_mode</span> Modo Escuro';
   },
 
   // Configurar botão existente no HTML
