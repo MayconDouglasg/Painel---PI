@@ -3,7 +3,7 @@
  * Gerencia login, logout e verificação de token
  */
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = "https://bk-eroswatch.onrender.com/api";
 
 const Auth = {
     /**
